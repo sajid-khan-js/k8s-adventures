@@ -88,29 +88,50 @@ kubectl create ingress alert --class=nginx \
 
 - Consumable pipeline libraries/GitHub actions
   - use these to setup your golden pipeline (e.g. auto pushes to team's
-    container registry in the platform after build, deploy step that updates config repo image tag), but let people pick and mix
-    and create their own pipelines
-- Helm chart/base kustomize to deploy an app. Used by teams so they don't have to
-  define basic k8s building blocks, and also lets you bake in things like ingress
-  controllers annotations
+    container registry in the platform after build, deploy step that updates
+    config repo image tag), but let people pick and mix and create their own
+    pipelines
+- Helm chart/base kustomize to deploy an app. Used by teams so they don't have
+  to define basic k8s building blocks, and also lets you bake in things like
+  ingress controllers annotations
 
 ##### User repo
 
 - CI pipeline e.g. how to build, test the app. Leave this flexible to devs but
   GitHub actions is a good choice
-- Helm chart/kustomization overlays to set k8s deployment options e.g. replicas, ports, cpu limits, env vars, healthz probes
+- Helm chart/kustomization overlays to set k8s deployment options e.g. replicas,
+  ports, cpu limits, env vars, healthz probes
   - Per env overrides required for this config too
 
 ##### Config repo
 
 Basically where the team defines their "product" on the platform
 
-- Hydrated deployment.yamls (i.e. where image tag gets updated), values taken from app repo
+- Hydrated deployment.yamls (i.e. where image tag gets updated), values taken
+  from app repo
 - Onboard metadata: e.g. team email/github group, cost centre, app git repos
   - allow teams to have multiple apps under one "product"
-- CD pipeline switches e.g. promotion between envs, tests before deploy, canary deployment, manual approval required for prod
+- CD pipeline switches e.g. promotion between envs, tests before deploy, canary
+  deployment, manual approval required for prod
 - Backing infra e.g. Crossplane resources
 - Notifications of build/deploy events e.g. to slack
-- Who can access my namespace/logs/secrets i.e. anything todo with my product on the platform
+- Who can access my namespace/logs/secrets i.e. anything todo with my product on
+  the platform
 
-:memo: It makes sense to have the config repo split in two. A user facing facade repo which allows platform users to define simple YAML. Then a repo which is actually watched by ArgoCD/Flux which takes the simple YAML and converts it to real K8s objects e.g. a Crossplane resource, an ArgoCD application, FluxCD helm release etc.
+:memo: It makes sense to have the config repo split in two. A user facing facade
+repo which allows platform users to define simple YAML. Then a repo which is
+actually watched by ArgoCD/Flux which takes the simple YAML and converts it to
+real K8s objects e.g. a Crossplane resource, an ArgoCD application, FluxCD helm
+release etc.
+
+## Kustomize
+
+- <https://kustomize.io/>
+- <https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization>
+- <https://www.youtube.com/watch?v=Twtbg6LFnAg> and
+  <https://gist.github.com/vfarcic/07b0b4642b5694d0239ee7c1629173ce>
+- <https://www.youtube.com/watch?v=ZMFYSm0ldQ0>
+
+Run `kubectl kustomize` wherever the `kustomization.yaml` is.
+
+Overlays vs Patch: <https://github.com/kubernetes-sigs/kustomize#usage>
