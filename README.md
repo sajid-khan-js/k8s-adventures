@@ -135,3 +135,9 @@ release etc.
 Run `kubectl kustomize` wherever the `kustomization.yaml` is.
 
 Overlays vs Patch: <https://github.com/kubernetes-sigs/kustomize#usage>
+
+## Java with K8s
+
+- <https://spring.io/guides/gs/maven/>
+- <https://learnk8s.io/spring-boot-kubernetes-guide>
+- <https://github.com/minio/minio>
