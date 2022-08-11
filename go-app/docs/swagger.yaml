@@ -1,0 +1,90 @@
+basePath: /namespaces
+definitions:
+  main.Namespace:
+    description: Namespace information
+    properties:
+      name:
+        description: https://github.com/go-playground/validator and https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-subdomain-names
+        type: string
+      pods:
+        items:
+          $ref: '#/definitions/main.Pod'
+        type: array
+    required:
+    - name
+    type: object
+  main.Pod:
+    description: Pod information
+    properties:
+      name:
+        type: string
+      status:
+        type: string
+    type: object
+host: localhost:5000
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Gin Swagger Example API
+  version: "2.0"
+paths:
+  /namespaces:
+    post:
+      consumes:
+      - application/json
+      description: Create a new namespace in the cluster.
+      parameters:
+      - description: Namespace name
+        in: body
+        name: name
+        required: true
+        schema:
+          $ref: '#/definitions/main.Namespace'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Namespace'
+      summary: Create a new namespace.
+  /namespaces/:
+    get:
+      description: Get all namespaces and all Pods in a cluster.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.Namespace'
+            type: array
+      summary: List namespaces in a K8s cluster.
+  /namespaces/{name}:
+    get:
+      description: Get Pods in a namespace.
+      parameters:
+      - description: Namespace name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Namespace'
+      summary: Get a K8s namespace and it's Pods.
+schemes:
+- http
+swagger: "2.0"

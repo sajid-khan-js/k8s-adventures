@@ -141,3 +141,27 @@ Overlays vs Patch: <https://github.com/kubernetes-sigs/kustomize#usage>
 - <https://spring.io/guides/gs/maven/>
 - <https://learnk8s.io/spring-boot-kubernetes-guide>
 - <https://github.com/minio/minio>
+
+## Go basic API
+
+> Trying out gin web framework, K8s client-go, Go Swagger (Open API) tools.
+
+- <https://gin-gonic.com/docs/quickstart/>
+- <https://blog.logrocket.com/building-microservices-go-gin/>
+- <https://www.koyeb.com/tutorials/deploy-go-gin-on-koyeb>
+- <https://www.youtube.com/watch?v=d_L64KT3SFM>
+- <https://go.dev/doc/tutorial/web-service-gin>
+- <https://gin-gonic.com/docs/examples/>
+- <https://gin-gonic.com/docs/testing/>
+- <https://pkg.go.dev/github.com/gin-gonic/gin#pkg-overview>
+- <https://kubernetes.io/docs/tasks/administer-cluster/access-cluster-api/>
+- <https://github.com/kubernetes/client-go/tree/master/examples/out-of-cluster-client-configuration>
+- <https://trstringer.com/connect-to-kubernetes-from-go/>
+- <https://medium.com/programming-kubernetes/building-stuff-with-the-kubernetes-api-1-cc50a3642>
+- <https://medium.com/programming-kubernetes/building-stuff-with-the-kubernetes-api-part-4-using-go-b1d0e3c1c899>
+- <https://itnext.io/generically-working-with-kubernetes-resources-in-go-53bce678f887>
+- <https://levelup.gitconnected.com/tutorial-generate-swagger-specification-and-swaggerui-for-gin-go-web-framework-9f0c038483b5>
+- <https://github.com/swaggo/swag>
+- <https://goswagger.io/> - Better, but a bit more of a learning curve
+- <https://github.com/swaggo/swag#declarative-comments-format>
+- <https://swagger.io/docs/specification/2-0/describing-parameters/>
