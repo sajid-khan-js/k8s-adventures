@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: go-app
+  namespace: go-app
+---
+# https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ns-pods-reader
+rules:
+# https://www.armosec.io/blog/a-guide-for-using-kubernetes-rbac/
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: [""]
+  resources: ["namespaces"]
+  verbs: ["get", "watch", "list", "create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ns-pods-reader
+subjects:
+- kind: ServiceAccount
+  name: go-app
+  namespace: go-app
+roleRef:
+  kind: ClusterRole
+  name: ns-pods-reader
+  apiGroup: rbac.authorization.k8s.io
+

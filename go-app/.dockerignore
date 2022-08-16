@@ -1,3 +1,4 @@
 *_test.go
 *.md
 gin-bin
+manifests/

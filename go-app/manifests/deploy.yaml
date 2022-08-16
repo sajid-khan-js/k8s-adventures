@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-app
+  namespace: go-app
+  labels:
+    app: go-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-app
+  template:
+    metadata:
+      labels:
+        app: go-app
+    spec:
+      serviceAccountName: go-app
+      containers:
+      - name: go-app
+        image: go-app:v1.0
+        imagePullPolicy: Never # So it will pull from docker-desktop
+        ports:
+        - containerPort: 8080
