@@ -141,7 +141,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "2.0",
-	Host:             "localhost:5000",
+	Host:             "localhost:8080",
 	BasePath:         "/namespaces",
 	Schemes:          []string{"http"},
 	Title:            "Gin Swagger Example API",

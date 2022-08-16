@@ -57,7 +57,7 @@ var namespaces = []Namespace{
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host localhost:5000
+// @host localhost:8080
 // @BasePath /namespaces
 // @schemes http
 func setupRouter() *gin.Engine {
@@ -68,7 +68,7 @@ func setupRouter() *gin.Engine {
 	router.GET("/namespaces/:name", getNamespaceByName)
 	router.POST("/namespaces", postNamespace)
 
-	// localhost:5000/swagger/index.html
+	// localhost:8080/swagger/index.html
 	docs.SwaggerInfo.BasePath = "/"
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
@@ -85,7 +85,7 @@ func main() {
 // @Produce json
 // @Success 200 {object} []Namespace
 // @Router /namespaces/ [get]
-// curl -v -L localhost:5000/namespaces
+// curl -v -L localhost:8080/namespaces
 func getNamespaces(c *gin.Context) {
 
 	clientSet, err := k8sclient.InitClient()
@@ -137,7 +137,7 @@ func getNamespaces(c *gin.Context) {
 // @Produce json
 // @Success 200 {object} Namespace
 // @Router /namespaces/{name} [get]
-// curl -v -L localhost:5000/namespaces/default
+// curl -v -L localhost:8080/namespaces/default
 func getNamespaceByName(c *gin.Context) {
 
 	name := c.Param("name")
@@ -191,7 +191,7 @@ func getNamespaceByName(c *gin.Context) {
 // @Success 200 {object} Namespace
 // @Router /namespaces [post]
 /*
-curl -v -L 'localhost:5000/namespaces/' \
+curl -v -L 'localhost:8080/namespaces/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "name": "mynamespace"
