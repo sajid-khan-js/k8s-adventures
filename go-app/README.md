@@ -6,7 +6,9 @@ Creating using `gin` <https://github.com/gin-gonic/gin>
 
 Let's you list Namespaces and Pods, and create Namespaces in a Kubernetes cluster.
 
-:memo: Check out of the `Makefile`
+## Usage
+
+Check out the `Makefile`
 
 ## Running locally
 
