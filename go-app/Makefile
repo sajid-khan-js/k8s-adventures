@@ -15,10 +15,10 @@ test:
 	go test ./modules/k8sclient
 	go test
 
-build: prep
+localbuild: prep
 	go build
 	
-container: prep
+build: prep
 	docker build --tag go-app:v1.0 .
 
 deploy:
@@ -26,4 +26,7 @@ deploy:
 	kubectl rollout restart deploy go-app
 	kubectl port-forward svc/go-app 8080:80
 
-builddeploy: container deploy
+builddeploy: build deploy
+
+all: prep lint test build deploy
+
