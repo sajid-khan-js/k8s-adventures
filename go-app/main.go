@@ -1,9 +1,15 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
+	"os/signal"
 	"strings"
+	"syscall"
+
+	"sync/atomic"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	docs "github.com/sajid-khan-js/k8s-adventures/go-app/docs"
@@ -68,6 +74,28 @@ func setupRouter() *gin.Engine {
 	router.GET("/namespaces/:name", getNamespaceByName)
 	router.POST("/namespaces", postNamespace)
 
+	router.GET("/healthz", func(c *gin.Context) { c.Status(http.StatusOK) })
+
+	// Mock readiness e.g. app might need to connect to db, load data, cache warm etc.
+	// https://blog.gopheracademy.com/advent-2017/kubernetes-ready-service/
+	isReady := &atomic.Value{}
+	isReady.Store(false)
+	// go routine, not blocking
+	go func() {
+		log.Printf("Readyz probe is negative by default...")
+		time.Sleep(15 * time.Second)
+		isReady.Store(true)
+		log.Printf("Readyz probe is positive.")
+	}()
+	router.GET("/readyz", func(c *gin.Context) {
+		if isReady == nil || !isReady.Load().(bool) {
+			c.Status(http.StatusServiceUnavailable)
+		} else {
+			c.Status(http.StatusOK)
+		}
+
+	})
+
 	// localhost:8080/swagger/index.html
 	docs.SwaggerInfo.BasePath = "/"
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -75,8 +103,47 @@ func setupRouter() *gin.Engine {
 	return router
 }
 func main() {
+	/*
+		Graceful shutdown:
+		https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-terminating-with-grace
+		https://github.com/gin-gonic/examples/blob/master/graceful-shutdown/graceful-shutdown/notify-with-context/server.go
+		https://gin-gonic.com/docs/examples/graceful-restart-or-stop/
+	*/
+	// Create context that listens for the interrupt signal from the OS.
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+
 	router := setupRouter()
-	router.Run("localhost:8080")
+
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: router,
+	}
+
+	// Initializing the server in a goroutine so that
+	// it won't block the graceful shutdown handling below
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+
+	// Listen for the interrupt signal.
+	<-ctx.Done()
+
+	// Restore default behaviour on the interrupt signal and notify user of shutdown.
+	stop()
+	log.Printf("Shutting down gracefully, will give 10 seconds for existing requests")
+
+	// The context is used to inform the server it has 10 seconds to finish
+	// the request it is currently handling
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("Server forced to shutdown: ", err)
+	}
+
+	log.Printf("Server exiting")
 }
 
 // getNamespaces godoc

@@ -2,3 +2,4 @@
 *.md
 gin-bin
 manifests/
+Makefile

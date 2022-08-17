@@ -24,6 +24,7 @@ build: prep
 deploy:
 	kubectl apply -f manifests/
 	kubectl rollout restart deploy go-app
+	sleep 5
 	kubectl port-forward svc/go-app 8080:80
 
 builddeploy: build deploy

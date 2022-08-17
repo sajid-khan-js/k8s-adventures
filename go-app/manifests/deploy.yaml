@@ -21,4 +21,16 @@ spec:
         image: go-app:v1.0
         imagePullPolicy: Never # So it will pull from docker-desktop
         ports:
-        - containerPort: 8080
+        - name: port
+          containerPort: 8080
+        # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: port
+          initialDelaySeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: port
+          initialDelaySeconds: 10
