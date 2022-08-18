@@ -47,7 +47,7 @@ spec:
             value: "true"
           - name: alertmanager.ingress.hosts[0]
           - name: nodeExporter.hostRootfs
-            value: false
+            value: "false"
     patches:
     - fromFieldPath: spec.id
       toFieldPath: metadata.name
