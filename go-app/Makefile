@@ -23,17 +23,17 @@ build: prep
 
 deploy:
 	kubectl apply -f manifests/
-	kubectl rollout restart deploy go-app
+	kubectl rollout restart deploy go-app -n go-app
 
 builddeploy: build deploy
 
 connect:
-	kubectl port-forward svc/go-app 8080:80
+	kubectl port-forward -n go-app svc/go-app 8080:80 
 
 all: prep lint test build deploy
 
 load:
-	while true; do curl http://localhost:8080/namespaces ; done
+	ab -n 100 -c 10 http://localhost:8080/namespaces
 
 logs:
 	kubectl logs -f -n go-app -l app=go-app --tail -1

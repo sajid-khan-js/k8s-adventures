@@ -2,12 +2,12 @@ package main
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os/signal"
 	"syscall"
-
 	"time"
+
+	"go.uber.org/zap"
 )
 
 // @title Gin Swagger Example API
@@ -36,6 +36,11 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+	undo := zap.ReplaceGlobals(logger)
+	defer undo()
+
 	router := setupRouter()
 
 	srv := &http.Server{
@@ -47,7 +52,7 @@ func main() {
 	// it won't block the graceful shutdown handling below
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("listen: %s\n", err)
+			zap.S().Fatal("listen: %s\n", err)
 		}
 	}()
 
@@ -56,15 +61,15 @@ func main() {
 
 	// Restore default behaviour on the interrupt signal and notify user of shutdown.
 	stop()
-	log.Printf("Shutting down gracefully, will give 10 seconds for existing requests")
+	zap.S().Info("Shutting down gracefully, will give 10 seconds for existing requests")
 
 	// The context is used to inform the server it has 10 seconds to finish
 	// the request it is currently handling
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatal("Server forced to shutdown: ", err)
+		zap.S().Fatal("Server forced to shutdown: ", err)
 	}
 
-	log.Printf("Server exiting")
+	zap.S().Info("Server exiting")
 }

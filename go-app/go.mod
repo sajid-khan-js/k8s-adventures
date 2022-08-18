@@ -3,6 +3,7 @@ module github.com/sajid-khan-js/k8s-adventures/go-app
 go 1.18
 
 require (
+	github.com/gin-contrib/zap v0.0.2
 	github.com/gin-gonic/gin v1.8.1
 	github.com/gkarthiks/k8s-discovery v0.23.1
 	github.com/prometheus/client_golang v1.13.0
@@ -10,6 +11,7 @@ require (
 	github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a
 	github.com/swaggo/gin-swagger v1.5.2
 	github.com/swaggo/swag v1.8.4
+	go.uber.org/zap v1.22.0
 	k8s.io/api v0.24.3
 	k8s.io/apimachinery v0.24.3
 )
@@ -54,6 +56,8 @@ require (
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
+	go.uber.org/atomic v1.7.0 // indirect
+	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
 	golang.org/x/oauth2 v0.0.0-20220223155221-ee480838109b // indirect

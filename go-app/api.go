@@ -1,27 +1,34 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"strings"
 
 	"sync/atomic"
 	"time"
 
+	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	docs "github.com/sajid-khan-js/k8s-adventures/go-app/docs"
 	"github.com/sajid-khan-js/k8s-adventures/go-app/modules/k8sclient"
 	swaggerFiles "github.com/swaggo/files"     // swagger embed files
 	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
+	"go.uber.org/zap"
 )
 
 func setupRouter() *gin.Engine {
 
 	router := gin.Default()
 
-	router.Use(DummyMiddleware)
+	// Logging middleware
+	router.Use(ginzap.Ginzap(zap.L(), time.RFC3339, true))
+	router.Use(ginzap.RecoveryWithZap(zap.L(), true))
 
+	// Prometheus middleware
+	router.Use(prometheusMiddleware)
+
+	// API endpoints
 	router.GET("/namespaces", getNamespaces)
 	router.GET("/namespaces/:name", getNamespaceByName)
 	router.POST("/namespaces", postNamespace)
@@ -30,17 +37,18 @@ func setupRouter() *gin.Engine {
 		c.Status(http.StatusOK)
 	})
 
-	// Mock readiness e.g. app might need to connect to db, load data, cache warm etc.
+	// Mock readiness e.g. app might need to connect to DB, load data, cache warm etc.
 	// https://blog.gopheracademy.com/advent-2017/kubernetes-ready-service/
 	isReady := &atomic.Value{}
 	isReady.Store(false)
 	// go routine, not blocking
 	go func() {
-		log.Printf("Readyz probe is negative by default...")
+		zap.S().Info("Readyz probe is negative...")
 		time.Sleep(15 * time.Second)
 		isReady.Store(true)
-		log.Printf("Readyz probe is positive.")
+		zap.S().Info("Readyz probe is positive.")
 	}()
+
 	router.GET("/readyz", func(c *gin.Context) {
 		if isReady == nil || !isReady.Load().(bool) {
 			c.Status(http.StatusServiceUnavailable)
@@ -50,7 +58,6 @@ func setupRouter() *gin.Engine {
 
 	})
 
-	// https://prometheus.io/docs/guides/go-application/ and https://gabrieltanner.org/blog/collecting-prometheus-metrics-in-golang/
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	// localhost:8080/swagger/index.html
@@ -71,14 +78,14 @@ func getNamespaces(c *gin.Context) {
 
 	clientSet, err := k8sclient.InitClient()
 	if err != nil {
-		log.Print(err)
+		zap.S().Error(err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Something went wrong on our side"})
 		return
 	}
 
 	rawNamespaces, err := k8sclient.GetNamespaces(*clientSet)
 	if err != nil {
-		log.Print(err)
+		zap.S().Error(err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Something went wrong on our side"})
 		return
 	}
@@ -92,7 +99,7 @@ func getNamespaces(c *gin.Context) {
 		// TODO share this code with getNamespaceByName
 		podsInNamespace, err := k8sclient.GetPods(*clientSet, ns)
 		if err != nil {
-			log.Print(err)
+			zap.S().Error(err)
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Something went wrong on our side"})
 			return
 		}
@@ -125,7 +132,7 @@ func getNamespaceByName(c *gin.Context) {
 
 	clientSet, err := k8sclient.InitClient()
 	if err != nil {
-		log.Print(err)
+		zap.S().Error(err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Something went wrong on our side"})
 		return
 	}
@@ -134,11 +141,11 @@ func getNamespaceByName(c *gin.Context) {
 	if err != nil {
 		switch {
 		case strings.Contains(err.Error(), "not found"):
-			log.Print(err)
+			zap.S().Error(err)
 			c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Namespace '" + name + "' not found"})
 			return
 		default:
-			log.Print(err)
+			zap.S().Error(err)
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Something went wrong on our side"})
 			return
 		}
@@ -193,7 +200,7 @@ func postNamespace(c *gin.Context) {
 
 	clientSet, err := k8sclient.InitClient()
 	if err != nil {
-		log.Print(err)
+		zap.S().Error(err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Something went wrong on our side"})
 		return
 	}
@@ -203,11 +210,11 @@ func postNamespace(c *gin.Context) {
 	if err != nil {
 		switch {
 		case strings.Contains(err.Error(), "already exists"):
-			log.Print(err)
+			zap.S().Error(err)
 			c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Namespace '" + name + "' already exists"})
 			return
 		default:
-			log.Print(err)
+			zap.S().Error(err)
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Something went wrong on our side"})
 			return
 		}
