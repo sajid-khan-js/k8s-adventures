@@ -13,6 +13,8 @@ import (
 
 https://prometheus.io/docs/guides/go-application/
 https://gabrieltanner.org/blog/collecting-prometheus-metrics-in-golang/
+https://www.jajaldoang.com/post/monitor-golang-app-with-prometheus-grafana/
+https://alex.dzyoba.com/blog/go-prometheus-service/
 
 */
 
@@ -47,6 +49,10 @@ func prometheusMiddleware(c *gin.Context) {
 	if path == "/metrics" {
 		c.Next()
 		return
+	}
+
+	if strings.Contains(path, "/swagger") {
+		path = "/swagger/"
 	}
 
 	// Ensure we don't generate time series for every possible namespace so /namespaces/kube-system becomes /namespaces/:name
