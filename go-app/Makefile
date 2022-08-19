@@ -40,3 +40,5 @@ logs:
 
 watch:
 	watch kubectl get pods -n go-app
+
+.PHONY: prep run gin lint test localbuild build deploy builddeploy connect all load logs watch
