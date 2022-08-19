@@ -19,13 +19,16 @@ localbuild: prep
 	go build
 	
 build: prep
-	docker build --tag go-app:v1.0 .
+	docker build --tag go-app .
 
 deploy:
 	kubectl apply -f manifests/
 	kubectl rollout restart deploy go-app -n go-app
 
 builddeploy: build deploy
+
+skaffold: 
+	skaffold dev
 
 connect:
 	kubectl port-forward -n go-app svc/go-app 8080:80 
@@ -41,4 +44,4 @@ logs:
 watch:
 	watch kubectl get pods -n go-app
 
-.PHONY: prep run gin lint test localbuild build deploy builddeploy connect all load logs watch
+.PHONY: prep run gin lint test localbuild build deploy builddeploy connect all load logs watch skaffold

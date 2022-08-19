@@ -1,6 +1,6 @@
 # k8s-adventures
 
-## Local tools
+## K8s local tools
 
 e.g. `kubens`, `kubectx`, `k9s`, `lens`
 
@@ -165,3 +165,8 @@ Overlays vs Patch: <https://github.com/kubernetes-sigs/kustomize#usage>
 - <https://goswagger.io/> - Better, but a bit more of a learning curve
 - <https://github.com/swaggo/swag#declarative-comments-format>
 - <https://swagger.io/docs/specification/2-0/describing-parameters/>
+
+## Skaffold
+
+-<https://skaffold.dev/docs/quickstart/>
+
